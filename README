@@ -1,0 +1,3 @@
+control_loop runs the main script, it uses a RTDE socket connection to send
+ waypoints to the UR. It also subscribe to mqtt topic. 
+The project aim to create an interface between Vision (who pubs wp through mqtt) and UR (who listen to socket) 
