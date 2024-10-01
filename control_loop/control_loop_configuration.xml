@@ -18,4 +18,8 @@
 	<recipe key="watchdog">
 		<field name="input_int_register_0" type="INT32"/>
 	</recipe>
+
+	<recipe key="new_target_found">
+		<field name="input_int_register_1" type="INT32"/>
+	</recipe>
 </rtde_config>
