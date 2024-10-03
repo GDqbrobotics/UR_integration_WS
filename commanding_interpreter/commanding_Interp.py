@@ -9,10 +9,11 @@ import time
 import datetime as dt
 
 import mqtt.subscriber as mqtt_sub
+import threading
 
 ROBOT_HOST = '192.168.1.96'
-rtde_config = 'rtdeState.xml'
-robotCommands = 'pnp.txt'
+rtde_config = '../rtde/rtdeState.xml'
+robotCommands = 'commands.txt'
 trajFile = 'traj.txt'
 # Enter robot path to Interpret.urp file
 pathToRobotProgram = '/programs/RemoteOperation/interpret.urp'
@@ -116,8 +117,7 @@ if __name__ == "__main__":
     th.start()
     # Attempt to call an interpreter function. Exit if robot program is stopped.
     try:
-        #sendFile.send_cmd_interpreter_mode_file(interpreter, robotCommands)
-        sendCommands.send_cmd_interpreter_mode_mqtt(interpreter,trajFile,sub)
+        sendCommands.send_cmd_interpreter_mode_mqtt(interpreter,trajFile, robotCommands, sub)
     except Exception as e:
         # Look for "invalid state" in the interpreter error message. Raise exception otherwise.
         if 'invalid state' in e.args[1]:

@@ -38,7 +38,7 @@ To test this project:
 1) Powerup the UR (you should have the **interpreter.urp** script inside */programs/RemoteOperation/* dir).
 2) TCP/IP connect PC to UR.
 3) In script directory, run ```python commanding_Interp.py```.
-4) Enter commands from keyboards (or read them from commands.txt, depends on the code...)
+4) Enter commands from keyboards (or read them from commands.txt, with RUN FILE keyword)
 5) To fake vision commands, run ```python publisher.py```. It will send the pick targets read from *targets.txt*.
 
 The integration of the vision system, other than calibration, needs to have a part of code that sends targets through mqtt as *publisher.py* does.

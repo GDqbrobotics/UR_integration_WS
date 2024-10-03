@@ -15,21 +15,26 @@ movej(get_inverse_kin(Home_pos_p, qnear=Home_pos_q), a=1.3962634015954636, v=1.0
 movel(Above_Pick_p, a=1.2, v=0.25, r=0.05)
 movel(Pick_p, a=1.2, v=0.25)
 # 'Close gripper command should be inserted here'
+WAIT TARGET
+CLOSE
 sleep(1.0)
 # set_target_payload(2.150000, [0.000000, 0.000000, 0.132000], [0.005513, 0.005513, 0.005513, 0.000000, 0.000000, 0.000000])
 movel(Above_Pick_p, a=1.2, v=0.25, r=0.05)
 movel(Above_Place_p, a=1.2, v=0.25, r=0.05)
 movel(Place_p, a=1.2, v=0.25)
 # 'Open gripper command should be inserted here'
+OPEN
 sleep(1.0)
 # set_target_payload(0.950000, [0.000000, 0.000000, 0.052000], [0.001413, 0.001413, 0.001413, 0.000000, 0.000000, 0.000000])
 movel(Above_Place_p, a=1.2, v=0.25)
 movel(Place_p, a=1.2, v=0.25)
 # 'Close gripper command should be inserted here'
+CLOSE
 sleep(1.0)
 # set_target_payload(2.150000, [0.000000, 0.000000, 0.132000], [0.005513, 0.005513, 0.005513, 0.000000, 0.000000, 0.000000])
 movel(Above_Place_p, a=1.2, v=0.25, r=0.05)
 movel(Above_Pick_p, a=1.2, v=0.25, r=0.05)
 movel(Pick_p, a=1.2, v=0.25)
 # 'Open gripper command should be inserted here'
+OPEN
 sleep(1.0)

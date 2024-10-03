@@ -7,8 +7,6 @@ sys.path.append('..')
 
 from interpreter.interpreter import InterpreterHelper
 
-import mqtt.subscriber as mqtt_sub
-
 # num of commands after which clear_interpreter() command will be invoked.
 # If interpreted statements are not cleared periodically then "runtime too much behind" error may
 # be shown when leaving interpreter mode
@@ -17,18 +15,33 @@ CLEARBUFFER_LIMIT = 500
 # logging.basicConfig(level=logging.INFO)
 
 
-def send_cmd_interpreter_mode_mqtt(intrp,commandFile,sub):
-    f = open(commandFile, "r")
+def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
+    f = open(trajFile, "r")
+    F = open(commFile, "r")
+
     trajectory_points = f.readlines()
+    commandLines = F.readlines()
+
     command_count = 1
+
     points_index = 0
+    file_lines_index = 0
+
     executing_traj = False
+    executing_file = False
 
     while True:
 
         if(not executing_traj):
-            line = input("Enter Command to execute: ")
-            match line:
+            if not executing_file:
+                line = input("Enter Command to execute: ")
+            else:
+                line = commandLines[file_lines_index].rstrip()
+                file_lines_index += 1
+                if file_lines_index == len(commandLines):
+                    executing_file = False
+
+            match str(line):
                 case "EXE":
                     executing_traj = True
                     point_index = 0
@@ -43,10 +56,13 @@ def send_cmd_interpreter_mode_mqtt(intrp,commandFile,sub):
                 case "WAIT TARGET":
                     while not sub.received_msg:
                         time.sleep(0.1)
-                    line = "movel(p" + sub.stored_position + ", a=0.5, v=0.25, r=0.05)"
+                    sub.reset_received_msg()
+                    line = "movel(p" + str(sub.stored_position) + ", a=0.5, v=0.25, r=0.05)"
 
-                case _:
-                    break
+                case "RUN FILE":
+                    executing_file = True
+                    file_lines_index = 0
+                    continue
 
         else:
             line = "movel(" + trajectory_points[point_index].rstrip() + ", a=0.5, v=0.25, r=0.05)"
