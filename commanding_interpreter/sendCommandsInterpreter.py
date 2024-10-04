@@ -55,7 +55,7 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
 
                 case "WAIT TARGET":
                     while not sub.received_msg:
-                        time.sleep(0.1)
+                        time.sleep(0.01)
                     sub.reset_received_msg()
                     line = "movel(p" + str(sub.stored_position) + ", a=0.5, v=0.25, r=0.05)"
 
@@ -65,7 +65,8 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
                     continue
 
         else:
-            line = "movel(" + trajectory_points[point_index].rstrip() + ", a=0.5, v=0.25, r=0.05)"
+            line = "movel(" + trajectory_points[point_index].rstrip() + ", a=0.1, v=0.25)"
+            # time.sleep(0.1)
             point_index = point_index + 1
             if point_index == len(trajectory_points):
                 executing_traj = False
