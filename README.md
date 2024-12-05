@@ -39,7 +39,10 @@ To test this project:
 2) TCP/IP connect PC to UR.
 3) In script directory, run ```python commanding_Interp.py```.
 4) Enter commands from keyboards (or read them from commands.txt, with RUN FILE keyword)
-5) To fake vision commands, run ```python publisher.py```. It will send the pick targets read from *targets.txt*.
+5) To fake vision commands, run ```python publisher.py```. It will send the pick and place targets read from *targets.txt*.
 
 The integration of the vision system, other than calibration, needs to have a part of code that sends targets through mqtt as *publisher.py* does.
 
+**Pick and Place target generator**
+
+Run ```python generate_place_positions.py``` to generate a set of 25 pick and place for Progetto Innesti. The place positions are generated from the center of the jar, with a pattern of 2 concentric circles.

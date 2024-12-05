@@ -12,10 +12,15 @@ def parse_message_to_vector(input_string):
         'Ry': 4,
         'Rz': 5
     }
+
+    parsed_data = {
+        'stored_position': [],
+        'action': ''
+    }
     
     # Initialize the vector with None values
     vector = [None] * 6
-
+    action = ''
     # Split the string by commas and strip whitespace
     elements = [e.strip() for e in input_string.split(',')]
     
@@ -30,12 +35,15 @@ def parse_message_to_vector(input_string):
             if key in expected_keys:
                 # Store the float value in the correct position
                 vector[expected_keys[key]] = float(value)
-            else:
-                print(f"Error: '{key}' is not a valid coordinate name.")
-                return [], False
+            else: 
+                if key == 'action':
+                    action = str(value)
+                else:
+                    print(f"Error: '{key}' is not a valid coordinate name.")
+                    return [], False
             
         except (ValueError, IndexError):
-            print(f"Error: '{e}' is not a valid entry. It should be in the format 'x: value_x, y: value_y, z: value_z, Rx: value_Rx, Ry: value_Ry, Rz: value_Rz'.")
+            print(f"Error: '{e}' is not a valid entry. It should be in the format 'x: value_x, y: value_y, z: value_z, Rx: value_Rx, Ry: value_Ry, Rz: value_Rz, action: Pick/Place'.")
             return [], False
             
     # Check if all required coordinates were provided
@@ -44,4 +52,6 @@ def parse_message_to_vector(input_string):
     else:
         print("Error: Not all coordinates were provided.")
     
-    return is_valid, vector
+    parsed_data['stored_position'] = vector
+    parsed_data['action'] = action
+    return is_valid, parsed_data

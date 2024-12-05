@@ -14,6 +14,22 @@ CLEARBUFFER_LIMIT = 500
 
 # logging.basicConfig(level=logging.INFO)
 
+def execute_line(intrp,line,command_count):
+    command_id = intrp.execute_command(line)
+    if command_count % CLEARBUFFER_LIMIT == 0:
+        # logging.info(f"{command_count} commands sent. Waiting for all commands to be executed before clear.")
+        # Wait for interpreted commands to be executed. New commands will be discarded if interpreter buffer
+        # limit is exceeded.
+        while intrp.get_last_executed_id() != command_id:
+            # logging.info(f"Last executed id {intrp.get_last_executed_id()}/{command_id}")
+            time.sleep(2)
+
+        # Manual buffer clear is necessary when large amount of statements is sent in one interpreter mode session.
+        # By default statements are cleared when leaving interpreter mode.
+        # Look at CLEARBUFFER_LIMIT comment for more info.
+        # logging.info("Clearing all interpreted statements")
+        intrp.clear()
+    command_count += 1
 
 def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
     f = open(trajFile, "r")
@@ -29,6 +45,7 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
 
     executing_traj = False
     executing_file = False
+    line = ''
 
     while True:
 
@@ -39,7 +56,8 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
                 line = commandLines[file_lines_index].rstrip()
                 file_lines_index += 1
                 if file_lines_index == len(commandLines):
-                    executing_file = False
+                    file_lines_index = 0
+                    #executing_file = False
 
             match str(line):
                 case "EXE":
@@ -48,20 +66,38 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
                     continue
 
                 case "CLOSE":
-                    line = "qbdevice.setClawCommand(2000,0)"
+                    line = "qbdevice.setClawCommand(6500,0)"
 
                 case "OPEN":
-                    line = "qbdevice.setClawCommand(-500,0)"
+                    line = "qbdevice.setClawCommand(4200,4000)"
 
                 case "WAIT TARGET":
                     while not sub.received_msg:
                         time.sleep(0.01)
                     sub.reset_received_msg()
-                    line = "movel(p" + str(sub.stored_position) + ", a=0.5, v=0.25, r=0.05)"
+                    approach_stored_position = sub.stored_position.copy()
+                    approach_stored_position[2] += 0.07 #approach 7cm above the target 
+                    line = "movel(p" + str(approach_stored_position) + ", a=1.2, v=0.25, r=0.0)"
+                    execute_line(intrp,line,command_count)
+                    line = "movel(p" + str(sub.stored_position) + ", a=0.1, v=0.1, r=0.0)"
+                    execute_line(intrp,line,command_count)
+                    if sub.action == 'Pick':
+                        line = "qbdevice.setClawCommand(6500,0)"
+                        execute_line(intrp,line,command_count)
+                        line = "sleep(1.5)"
+                        execute_line(intrp,line,command_count)
+                    else:
+                        if sub.action == 'Place':
+                            line = "qbdevice.setClawCommand(4200,4000)"
+                            execute_line(intrp,line,command_count)
+                            line = "sleep(1.0)"
+                            execute_line(intrp,line,command_count)
+                    line = "movel(p" + str(approach_stored_position) + ", a=1.2, v=0.25, r=0.0)"
 
                 case "RUN FILE":
+                    if not executing_file:
+                        file_lines_index = 0 #RUN FILE command not allowed inside file, it would create infinite loop
                     executing_file = True
-                    file_lines_index = 0
                     continue
 
         else:
@@ -72,18 +108,4 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
                 executing_traj = False
                 point_index = 0
 
-        command_id = intrp.execute_command(line)
-        if command_count % CLEARBUFFER_LIMIT == 0:
-            # logging.info(f"{command_count} commands sent. Waiting for all commands to be executed before clear.")
-            # Wait for interpreted commands to be executed. New commands will be discarded if interpreter buffer
-            # limit is exceeded.
-            while intrp.get_last_executed_id() != command_id:
-                # logging.info(f"Last executed id {intrp.get_last_executed_id()}/{command_id}")
-                time.sleep(2)
-
-            # Manual buffer clear is necessary when large amount of statements is sent in one interpreter mode session.
-            # By default statements are cleared when leaving interpreter mode.
-            # Look at CLEARBUFFER_LIMIT comment for more info.
-            # logging.info("Clearing all interpreted statements")
-            intrp.clear()
-        command_count += 1
+        execute_line(intrp,line,command_count)    
