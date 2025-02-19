@@ -76,7 +76,7 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
                         time.sleep(0.01)
                     sub.reset_received_msg()
                     approach_stored_position = sub.stored_position.copy()
-                    approach_stored_position[2] += 0.07 #approach 7cm above the target 
+                    approach_stored_position[2] += 0.08 #approach 7cm above the target 
                     line = "movel(p" + str(approach_stored_position) + ", a=1.2, v=0.25, r=0.0)"
                     execute_line(intrp,line,command_count)
                     line = "movel(p" + str(sub.stored_position) + ", a=0.1, v=0.1, r=0.0)"
@@ -92,6 +92,9 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
                             execute_line(intrp,line,command_count)
                             line = "sleep(1.0)"
                             execute_line(intrp,line,command_count)
+                            # Here we have to know the center of the jar
+                            approach_stored_position[0] = 0.08 #jar x
+                            approach_stored_position[1] = -0.5 #jar y
                     line = "movel(p" + str(approach_stored_position) + ", a=1.2, v=0.25, r=0.0)"
 
                 case "RUN FILE":
@@ -101,7 +104,7 @@ def send_cmd_interpreter_mode_mqtt(intrp,trajFile,commFile,sub):
                     continue
 
         else:
-            line = "movel(" + trajectory_points[point_index].rstrip() + ", a=0.1, v=0.25)"
+            line = "movel(" + trajectory_points[point_index].rstrip() + ", a=0.05, v=0.1, r=0.0)"
             # time.sleep(0.1)
             point_index = point_index + 1
             if point_index == len(trajectory_points):

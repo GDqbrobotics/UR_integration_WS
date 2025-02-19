@@ -50,8 +50,8 @@ def convert_pixels_to_meters(points, img_size):
 def save_points_to_file(points, filename):
     with open(filename, 'w') as f:
         for x, y in points:
-            f.write(f"p[{x:.3f}, {y:.3f}, 0.01, 2.1, 2.25, 0]\n")
-        f.write("p[0, -0.6, 0.1, 2.1, 2.25, 0]\n")
+            f.write(f"p[{x:.3f}, {y:.3f}, 0.2, 2.1, 2.25, 0]\n")
+        f.write("p[0, -0.6, 0.2, 2.1, 2.25, 0]\n")
 
 def main():
     image_path = 'image.png'  # Update this to your image path
